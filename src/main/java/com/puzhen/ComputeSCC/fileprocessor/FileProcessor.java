@@ -2,6 +2,16 @@ package com.puzhen.ComputeSCC.fileprocessor;
 
 import java.io.*;
 
+/*
+ * The test cases copied from discussion forum contains
+ * empty lines. This program helps get rid of it.
+ * ----------------------------------------------------
+ * USAGE:
+ * 1. put the data file at the root directory of this program
+ * 2. in line "processor.deleteEmptyLines("33200.txt");", change the argument to the 
+ * name of your file.
+ * 3. run it and boom you get what you want.
+ */
 public class FileProcessor {
 
 	public void deleteEmptyLines(String filename) throws IOException {
@@ -26,7 +36,7 @@ public class FileProcessor {
 	public static void main(String[] args) {
 		FileProcessor processor = new FileProcessor();
 		try {
-			processor.deleteEmptyLines("33300.txt");
+			processor.deleteEmptyLines("33200.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

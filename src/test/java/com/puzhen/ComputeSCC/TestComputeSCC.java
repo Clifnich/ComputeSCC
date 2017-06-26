@@ -1,5 +1,7 @@
 package com.puzhen.ComputeSCC;
 
+import java.io.IOException;
+
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -28,13 +30,32 @@ public class TestComputeSCC extends TestCase {
 		assertTrue(comparitor.arrayEquals(result, calculator.computeSCC(null)));
 	}
 	
-	public void testCreateGraph() {
+	/**
+	 * Test the create graph method.
+	 * Case 1.
+	 * @throws IOException
+	 */
+	public void testCreateGraph() throws IOException {
 		// here we assume that the file is at the root directory of this project
-		String filename = "";
+		String filename = "33300.txt";
 		SCCCalculator calculator = new SCCCalculator();
 		Graph<String, DefaultEdge> graph = calculator.createGraphFromFile(filename);
 		assertEquals(9, graph.vertexSet().size());
 		assertEquals(1, graph.getAllEdges("1", "4").size());
 		assertTrue(graph.containsVertex("5"));
+	}
+	
+	/**
+	 * Test the create graph method.
+	 * Case 2.
+	 */
+	public void testCreateGraph1() throws IOException {
+		String filename = "33200.txt";
+		SCCCalculator calculator = new SCCCalculator();
+		Graph<String, DefaultEdge> graph = calculator.createGraphFromFile(filename);
+		assertEquals(8, graph.vertexSet().size());
+		assertEquals(1, graph.getAllEdges("1", "2").size());
+		assertEquals(0, graph.getAllEdges("1", "7").size());
+		assertTrue(graph.containsVertex("3"));
 	}
 }
