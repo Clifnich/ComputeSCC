@@ -3,6 +3,7 @@ package com.puzhen.ComputeSCC;
 import java.io.IOException;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import com.puzhen.ComputeSCC.testutility.ArrayComparitor;
@@ -27,7 +28,9 @@ public class TestComputeSCC extends TestCase {
 	public void testCompute0() {
 		SCCCalculator calculator = new SCCCalculator();
 		int[] result = {0,0,0,0,0};
-		assertTrue(comparitor.arrayEquals(result, calculator.computeSCC(null)));
+		assertTrue(comparitor.arrayEquals(result, 
+				calculator.computeSCC(
+						new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class))));
 	}
 	
 	/**
@@ -57,5 +60,31 @@ public class TestComputeSCC extends TestCase {
 		assertEquals(1, graph.getAllEdges("1", "2").size());
 		assertEquals(0, graph.getAllEdges("1", "7").size());
 		assertTrue(graph.containsVertex("3"));
+	}
+	
+	/**
+	 * Test create inverse graph.
+	 * Case 1.
+	 */
+	public void testCreateInvGraph0() throws IOException {
+		String filename = "33300.txt";
+		SCCCalculator calculator = new SCCCalculator();
+		Graph<String, DefaultEdge> graph = calculator.createInverseGraphFromFile(filename);
+		assertEquals(9, graph.vertexSet().size());
+		assertEquals(1, graph.getAllEdges("4", "1").size());
+		assertEquals(0, graph.getAllEdges("3", "6").size());
+	}
+	
+	/**
+	 * Test creating inverse graph.
+	 * Case 2.
+	 */
+	public void testCreateInvGraph1() throws IOException {
+		String filename = "33200.txt";
+		SCCCalculator calculator = new SCCCalculator();
+		Graph<String, DefaultEdge> graph = calculator.createInverseGraphFromFile(filename);
+		assertEquals(8, graph.vertexSet().size());
+		assertEquals(1, graph.getAllEdges("4", "2").size());
+		assertEquals(0, graph.getAllEdges("8", "5").size());
 	}
 }
