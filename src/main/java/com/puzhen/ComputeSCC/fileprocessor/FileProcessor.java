@@ -19,15 +19,21 @@ public class FileProcessor {
 	 * Change vertex name based on a mapping function.
 	 * @throws IOException 
 	 */
-	public void changeVertexNames(String old_name, Map<String, String> f, String new_name) throws IOException {
-		File new_file = new File(new_name);
-		File old_file = new File(old_name);
+	public void changeVertexNames(String old_filename, 
+			Map<String, String> f, String new_filename) throws IOException {
+		File new_file = new File(new_filename);
+		File old_file = new File(old_filename);
 		BufferedReader rd = new BufferedReader(new FileReader(old_file));
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new_file));
 		String line = "";
+		boolean first = true;
 		while ((line = rd.readLine()) != null) {
 			String[] vertices = line.split(" ");
-			writer.write(f.get(vertices[0]) + " " + f.get(vertices[1]) + "\r\n");
+			if (first) {
+				writer.write(f.get(vertices[0]) + " " + f.get(vertices[1]));
+				first = false;
+			} else
+				writer.write("\r\n" + f.get(vertices[0]) + " " + f.get(vertices[1]));
 		}
 		rd.close();
 		writer.flush();writer.close();
@@ -45,9 +51,15 @@ public class FileProcessor {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
 		String line = "";
 		// write the non-empty lines to the temp file
+		boolean first = true;
 		while ((line = rd.readLine()) != null) {
-			if (!line.equals(""))
-				writer.write(line + "\r\n");
+			if (!line.equals("")) {
+				if (first) {
+					writer.write(line);
+					first = false;
+				} else
+					writer.write("\r\n" + line);
+			}
 		}
 		rd.close();
 		writer.flush();writer.close();

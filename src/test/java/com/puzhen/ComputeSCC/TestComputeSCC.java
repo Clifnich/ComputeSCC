@@ -3,7 +3,6 @@ package com.puzhen.ComputeSCC;
 import java.io.IOException;
 
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import com.puzhen.ComputeSCC.testutility.ArrayComparitor;
@@ -24,13 +23,25 @@ public class TestComputeSCC extends TestCase {
 	 * represented by null here, the calculator will
 	 * produce a result of {0,0,0,0,0} as specified
 	 * in the assignment page.
+	 * @throws IOException 
 	 */
-	public void testCompute0() {
+	public void testCompute0() throws IOException {
 		SCCCalculator calculator = new SCCCalculator();
 		int[] result = {0,0,0,0,0};
 		assertTrue(comparitor.arrayEquals(result, 
-				calculator.computeSCC(
-						new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class))));
+				calculator.computeSCC("")));
+	}
+	
+	/**
+	 * Compute the graph from 33200.txt
+	 * Expect the result to be 33200
+	 * @throws IOException
+	 */
+	public void testCompute1() throws IOException {
+		SCCCalculator calculator = new SCCCalculator();
+		int[] result = {3,3,2,0,0};
+		assertTrue(comparitor.arrayEquals(result, 
+				calculator.computeSCC("33200.txt")));
 	}
 	
 	/**

@@ -1,10 +1,15 @@
 package com.puzhen.ComputeSCC;
 
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import com.puzhen.ComputeSCC.fileprocessor.FileProcessor;
+
 import java.io.*;
+import java.util.*;
 
 public class SCCCalculator {
 	
@@ -15,20 +20,131 @@ public class SCCCalculator {
 	 * @return
 	 */
 	public int[] computeSCC(Graph<String, DefaultEdge> graph) {
-		int[] defaultReturnValue = {0,0,0,0,0};
-		
-		
+		int[] defaultReturnValue = {0,0,0,0,0};	
 		return defaultReturnValue;
 	}
 	
 	/**
 	 * This method computes the SCC(strongly connected components)
 	 * based on the Kosaraju's Two-Pass Algorithm.
+	 * @throws IOException 
 	 */
-	public int[] computeSCC(String filename) {
+	public int[] computeSCC(String filename) throws IOException {
 		int[] defaultReturnValue = {0,0,0,0,0};	
-		return defaultReturnValue;
+		if (!(new File(filename)).exists())
+			return defaultReturnValue;
+		// #1. Let G_rev = G with all edges reversed
+		Graph<String, DefaultEdge> inversed_graph = createInverseGraphFromFile(filename);
+		// #2. Run DFS-Loop on G_rev
+		Map<String, String> f = new HashMap<String, String>();
+		int t = 0; String s = "";
+		cleanMap(inversed_graph);
+		for (int i = inversed_graph.vertexSet().size(); i > 0; i--) {
+			// since vertex names are numbers, I can do this trick
+			String vex = String.valueOf(i);
+			if (!exploreMap.get(vex)) {
+				// DFS(G, vex)
+				Stack<String> stack = new Stack<String>();
+				stack.push(vex);
+				while (!stack.isEmpty()) {
+					String v = stack.pop();
+					exploreMap.replace(v, new Boolean(true));
+					List<String> neighbors = 
+							Graphs.successorListOf(
+									(DirectedGraph<String, DefaultEdge>)inversed_graph, v);
+					for (String neighbor : neighbors) {
+						if (!exploreMap.get(neighbor))
+							stack.push(neighbor);
+					}
+					t++;
+					f.put(v, String.valueOf(t));
+				}
+			}
+		}
+		// #3. Run DFS-Loop on G
+		FileProcessor processor = new FileProcessor();
+		String newFilename = filename + "_second";
+		processor.changeVertexNames(filename, f, newFilename);
+		Graph<String, DefaultEdge> graph = createGraphFromFile(newFilename);
+		Map<String, String> leaderMap = new HashMap<String, String>();
+		cleanMap(graph); t = 0; s = "";
+		for (int i = graph.vertexSet().size(); i > 0; i--) {
+			String vex = String.valueOf(i);
+			if (!exploreMap.get(vex)) {
+				s = vex;
+				// DFS(G, vex)
+				Stack<String> stack = new Stack<String>();
+				stack.push(vex);
+				while (!stack.isEmpty()) {
+					String v = stack.pop();
+					exploreMap.replace(v, new Boolean(true));
+					// set leader(v) = node s
+					leaderMap.put(v, s);
+					List<String> neighbors = 
+							Graphs.successorListOf(
+									(DirectedGraph<String, DefaultEdge>)graph, v);
+					for (String neighbor : neighbors) {
+						if (!exploreMap.get(neighbor))
+							stack.push(neighbor);
+					}
+				}
+			}
+		}
+		
+		return getSCCFromLeaderMap(leaderMap);
 	}
+	
+	/**
+	 * Provide a leader map, compute the SCCs from it
+	 * @param map
+	 * @return
+	 */
+	private int[] getSCCFromLeaderMap(Map<String, String> map) {
+		// count each SCC's size
+		Map<String, Integer> countMap = new HashMap<String, Integer>();
+		for (String key : map.keySet()) {
+			String leader = map.get(key);
+			if (countMap.containsKey(leader)) {
+				countMap.replace(leader, countMap.get(leader).intValue() + 1);
+			} else {
+				countMap.put(leader, 1);
+			}
+		}
+		// sort the map
+		//countMap = MapUtility.sortByValue(countMap);
+		// inverse the key value
+		Map<Integer, String> inverse = new HashMap<Integer, String>();
+		for (String key : countMap.keySet()) {
+			inverse.put(countMap.get(key), key);
+		}
+		int[] array = new int[inverse.keySet().size()];
+		int i = 0;
+		for (Integer key : inverse.keySet()) {
+			array[i] = key;
+			i++;
+		}
+		QuickSorter sorter = new QuickSorter();
+		int[] result = new int[5];
+		sorter.quick_sort(array);
+		for (i = 0; i < 5; i++) {
+			try {
+				result[i] = array[i];
+			} catch (ArrayIndexOutOfBoundsException e) {
+				result[i] = 0;
+			}
+		}
+		
+//		for (String key : countMap.keySet()) {
+//			if (i == 5) break;
+//			result[i] = countMap.get(key);
+//			i++;
+//		}
+		return result;
+	}
+	
+//	/** Some global variables for computing SCCs */
+//	private int t = 0;
+//	private String s;
 	
 	/**
 	 * Create a graph with inverse edges from file
@@ -83,6 +199,21 @@ public class SCCCalculator {
 		rd.close();
 		return graph;
 	}
+	
+	/**
+	 * At the very beginning of each search,
+	 * mark every vertices as unexplored.
+	 * @param graph
+	 */
+	private void cleanMap(Graph<String, DefaultEdge> graph) {
+		exploreMap = new HashMap<String, Boolean>();
+		for (String vex : graph.vertexSet()) {
+			exploreMap.put(vex, new Boolean(false));
+		}
+	}
+	
+	/** This map keeps track of if each particular vertex has been explored or not */
+	private Map<String, Boolean> exploreMap;
 	
 	private static final String NORMAL = "NORMAL";
 	private static final String INVERSE = "INVERSE";
