@@ -1,6 +1,7 @@
 package com.puzhen.ComputeSCC.fileprocessor;
 
 import java.io.*;
+import java.util.Map;
 
 /*
  * The test cases copied from discussion forum contains
@@ -14,6 +15,29 @@ import java.io.*;
  */
 public class FileProcessor {
 
+	/**
+	 * Change vertex name based on a mapping function.
+	 * @throws IOException 
+	 */
+	public void changeVertexNames(String old_name, Map<String, String> f, String new_name) throws IOException {
+		File new_file = new File(new_name);
+		File old_file = new File(old_name);
+		BufferedReader rd = new BufferedReader(new FileReader(old_file));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new_file));
+		String line = "";
+		while ((line = rd.readLine()) != null) {
+			String[] vertices = line.split(" ");
+			writer.write(f.get(vertices[0]) + " " + f.get(vertices[1]) + "\r\n");
+		}
+		rd.close();
+		writer.flush();writer.close();
+	}
+	
+	/**
+	 * Delete empty lines in a file.
+	 * @param filename
+	 * @throws IOException
+	 */
 	public void deleteEmptyLines(String filename) throws IOException {
 		File origin = new File(filename);
 		File temp = new File(filename + ".temp");
