@@ -37,7 +37,7 @@ public class SCCCalculator {
 		Graph<String, DefaultEdge> inversed_graph = createInverseGraphFromFile(filename);
 		// #2. Run DFS-Loop on G_rev
 		System.out.println("Computing finishing time..");
-		Map<String, String> f = computeFinishingTime(inversed_graph);
+		Map<String, String> f = dfs_loop(inversed_graph);
 		System.out.println("Done computing finishing time, computing leader map now...");
 		// #3. Run DFS-Loop on G
 		FileProcessor processor = new FileProcessor();
@@ -50,12 +50,54 @@ public class SCCCalculator {
 	}
 	
 	/**
+	 * Use DFS-Loop to compute the finishing time mapping.
+	 */
+	public Map<String, String> dfs_loop(Graph<String, DefaultEdge> graph) {
+		t = 0;
+		f = new HashMap<String, String>();
+		cleanMap(graph);
+		for (int i = graph.vertexSet().size(); i > 0; i--) {
+			String vex = String.valueOf(i);
+			if (!exploreMap.get(vex)) {
+				dfs(graph, vex);
+			}
+		}
+		return f;
+	}
+	
+	/**
+	 * Core DFS recursive method
+	 * @param graph
+	 * @param vex
+	 */
+	private void dfs(Graph<String, DefaultEdge> graph, String vex) {
+		exploreMap.replace(vex, new Boolean(true));
+		List<String> neighbors = 
+				Graphs.successorListOf(
+						(DirectedGraph<String, DefaultEdge>)graph, vex);
+		for (String neighbor : neighbors) {
+			if (!exploreMap.get(neighbor))
+				dfs(graph, neighbor);
+		}
+		t++;
+		f.put(vex, String.valueOf(t));
+	}
+	
+	private int t;
+	private Map<String, String> f;
+	
+	/**
 	 * Compute the finishing time mapping.
 	 */
 	public Map<String, String> computeFinishingTime(Graph<String, DefaultEdge> graph) {
 		Map<String, String> f = new HashMap<String, String>();
 		// stack for finishing time
 		Stack<String> s_f = new Stack<String>();
+		// map for finishing time stack
+		Map<String, Boolean> s_map = new HashMap<String, Boolean>();
+		for (String vex : graph.vertexSet()) {
+			s_map.put(vex, new Boolean(false));
+		}
 		int t = 0;
 		cleanMap(graph);
 		for (int i = graph.vertexSet().size(); i > 0; i--) {
@@ -68,7 +110,8 @@ public class SCCCalculator {
 				stack.push(vex);
 				while (!stack.isEmpty()) {
 					vex = stack.pop();
-					s_f.push(vex);
+					if (!s_f.contains(vex))
+							s_f.push(vex);
 					exploreMap.replace(vex, new Boolean(true));
 					List<String> neighbors = 
 							Graphs.successorListOf(
@@ -81,10 +124,8 @@ public class SCCCalculator {
 				while (!s_f.isEmpty()) {
 					vex = s_f.pop();
 					t++;
-					if (t > 875714) {
-						System.out.println("Finishing time for " + vex + " is too long: " + t);
-					}
 					f.put(vex, String.valueOf(t));
+
 				}
 			}
 		}
@@ -128,7 +169,7 @@ public class SCCCalculator {
 	 * @param map
 	 * @return
 	 */
-	private int[] getSCCFromLeaderMap(Map<String, String> map) {
+	public int[] getSCCFromLeaderMap(Map<String, String> map) {
 		// count each SCC's size
 		Map<String, Integer> countMap = new HashMap<String, Integer>();
 		for (String key : map.keySet()) {
@@ -157,7 +198,7 @@ public class SCCCalculator {
 		sorter.quick_sort(array);
 		for (i = 0; i < 5; i++) {
 			try {
-				result[i] = array[i];
+				result[i] = array[array.length - 1 - i];
 			} catch (ArrayIndexOutOfBoundsException e) {
 				result[i] = 0;
 			}
@@ -256,6 +297,7 @@ public class SCCCalculator {
 			exploreMap.put(vex, new Boolean(false));
 		}
 	}
+	
 	
 	/** This map keeps track of if each particular vertex has been explored or not */
 	private Map<String, Boolean> exploreMap;

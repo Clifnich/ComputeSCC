@@ -11,7 +11,7 @@ public class RunAllTests {
 		suite.addTestSuite(TestArrayComparitor.class);
 		suite.addTestSuite(TestComputeSCC.class);
 		suite.addTestSuite(TestBasicSearch.class);
-		suite.addTestSuite(TestComputeSCC.class);
+		suite.addTestSuite(TestFileProcessor.class);
 		//$JUnit-END$
 		return suite;
 	}
