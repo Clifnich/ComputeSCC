@@ -1,6 +1,7 @@
 package com.puzhen.ComputeSCC;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -37,12 +38,12 @@ public class TestComputeSCC extends TestCase {
 	 * Expect the result to be 33200
 	 * @throws IOException
 	 */
-	public void testCompute1() throws IOException {
-		SCCCalculator calculator = new SCCCalculator();
-		int[] result = {3,3,2,0,0};
-		assertTrue(comparitor.arrayEquals(result, 
-				calculator.computeSCC("33200.txt")));
-	}
+//	public void testCompute1() throws IOException {
+//		SCCCalculator calculator = new SCCCalculator();
+//		int[] result = {3,3,2,0,0};
+//		assertTrue(comparitor.arrayEquals(result, 
+//				calculator.computeSCC("33200.txt")));
+//	}
 	
 	/**
 	 * Test the create graph method.
@@ -97,5 +98,21 @@ public class TestComputeSCC extends TestCase {
 		assertEquals(8, graph.vertexSet().size());
 		assertEquals(1, graph.getAllEdges("4", "2").size());
 		assertEquals(0, graph.getAllEdges("8", "5").size());
+	}
+	
+	/**
+	 * Test compute finishing time mapping.
+	 * @throws IOException 
+	 */
+	public void testFinishingTime() throws IOException {
+		String filename = "33200.txt";
+		SCCCalculator calculator = new SCCCalculator();
+		Graph<String, DefaultEdge> graph = calculator.createInverseGraphFromFile(filename);
+		Map<String, String> finishingTime = calculator.computeFinishingTime(graph);
+		assertEquals("8", finishingTime.get("5"));
+		assertEquals("7", finishingTime.get("4"));
+		assertEquals("4", finishingTime.get("6"));
+		assertEquals("5", finishingTime.get("7"));
+		assertEquals("6", finishingTime.get("8"));
 	}
 }

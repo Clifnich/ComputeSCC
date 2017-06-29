@@ -95,6 +95,45 @@ public class SCCCalculator {
 	}
 	
 	/**
+	 * Compute the finishing time mapping.
+	 */
+	public Map<String, String> computeFinishingTime(Graph<String, DefaultEdge> graph) {
+		Map<String, String> f = new HashMap<String, String>();
+		// stack for finishing time
+		Stack<String> s_f = new Stack<String>();
+		int t = 0;
+		cleanMap(graph);
+		for (int i = graph.vertexSet().size(); i > 0; i--) {
+			// since vertex names are numbers, I can do this trick
+			String vex = String.valueOf(i);
+			if (!exploreMap.get(vex)) {
+				// DFS(G, vex)
+				Stack<String> stack = new Stack<String>();
+				s_f = new Stack<String>();
+				stack.push(vex);
+				while (!stack.isEmpty()) {
+					vex = stack.pop();
+					s_f.push(vex);
+					exploreMap.replace(vex, new Boolean(true));
+					List<String> neighbors = 
+							Graphs.successorListOf(
+									(DirectedGraph<String, DefaultEdge>)graph, vex);
+					for (String neighbor : neighbors) {
+						if (!exploreMap.get(neighbor))
+							stack.push(neighbor);
+					}
+				}
+				while (!s_f.isEmpty()) {
+					vex = s_f.pop();
+					t++;
+					f.put(vex, String.valueOf(t));
+				}
+			}
+		}
+		return f;
+	}
+	
+	/**
 	 * Provide a leader map, compute the SCCs from it
 	 * @param map
 	 * @return
