@@ -36,14 +36,16 @@ public class SCCCalculator {
 		// #1. Let G_rev = G with all edges reversed
 		Graph<String, DefaultEdge> inversed_graph = createInverseGraphFromFile(filename);
 		// #2. Run DFS-Loop on G_rev
+		System.out.println("Computing finishing time..");
 		Map<String, String> f = computeFinishingTime(inversed_graph);
+		System.out.println("Done computing finishing time, computing leader map now...");
 		// #3. Run DFS-Loop on G
 		FileProcessor processor = new FileProcessor();
 		String newFilename = filename + "_second";
 		processor.changeVertexNames(filename, f, newFilename);
 		Graph<String, DefaultEdge> graph = createGraphFromFile(newFilename);
 		Map<String, String> leaderMap = computeLeaderMap(graph);
-	
+		System.out.println("Done computing leader map, sorting it now..");
 		return getSCCFromLeaderMap(leaderMap);
 	}
 	
@@ -241,4 +243,11 @@ public class SCCCalculator {
 	
 	private static final String NORMAL = "NORMAL";
 	private static final String INVERSE = "INVERSE";
+	
+	public static void main(String[] args) throws IOException {
+		SCCCalculator calculator = new SCCCalculator();
+		int[] result = calculator.computeSCC("/Users/Ishmael/Desktop/scc.txt");
+		for (int i : result)
+			System.out.println(i);
+	}
 }
