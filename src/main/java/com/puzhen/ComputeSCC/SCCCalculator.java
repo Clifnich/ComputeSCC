@@ -36,61 +36,14 @@ public class SCCCalculator {
 		// #1. Let G_rev = G with all edges reversed
 		Graph<String, DefaultEdge> inversed_graph = createInverseGraphFromFile(filename);
 		// #2. Run DFS-Loop on G_rev
-		Map<String, String> f = new HashMap<String, String>();
-		int t = 0; String s = "";
-		cleanMap(inversed_graph);
-		for (int i = inversed_graph.vertexSet().size(); i > 0; i--) {
-			// since vertex names are numbers, I can do this trick
-			String vex = String.valueOf(i);
-			if (!exploreMap.get(vex)) {
-				// DFS(G, vex)
-				Stack<String> stack = new Stack<String>();
-				stack.push(vex);
-				while (!stack.isEmpty()) {
-					String v = stack.pop();
-					exploreMap.replace(v, new Boolean(true));
-					List<String> neighbors = 
-							Graphs.successorListOf(
-									(DirectedGraph<String, DefaultEdge>)inversed_graph, v);
-					for (String neighbor : neighbors) {
-						if (!exploreMap.get(neighbor))
-							stack.push(neighbor);
-					}
-					t++;
-					f.put(v, String.valueOf(t));
-				}
-			}
-		}
+		Map<String, String> f = computeFinishingTime(inversed_graph);
 		// #3. Run DFS-Loop on G
 		FileProcessor processor = new FileProcessor();
 		String newFilename = filename + "_second";
 		processor.changeVertexNames(filename, f, newFilename);
 		Graph<String, DefaultEdge> graph = createGraphFromFile(newFilename);
-		Map<String, String> leaderMap = new HashMap<String, String>();
-		cleanMap(graph); t = 0; s = "";
-		for (int i = graph.vertexSet().size(); i > 0; i--) {
-			String vex = String.valueOf(i);
-			if (!exploreMap.get(vex)) {
-				s = vex;
-				// DFS(G, vex)
-				Stack<String> stack = new Stack<String>();
-				stack.push(vex);
-				while (!stack.isEmpty()) {
-					String v = stack.pop();
-					exploreMap.replace(v, new Boolean(true));
-					// set leader(v) = node s
-					leaderMap.put(v, s);
-					List<String> neighbors = 
-							Graphs.successorListOf(
-									(DirectedGraph<String, DefaultEdge>)graph, v);
-					for (String neighbor : neighbors) {
-						if (!exploreMap.get(neighbor))
-							stack.push(neighbor);
-					}
-				}
-			}
-		}
-		
+		Map<String, String> leaderMap = computeLeaderMap(graph);
+	
 		return getSCCFromLeaderMap(leaderMap);
 	}
 	
@@ -131,6 +84,38 @@ public class SCCCalculator {
 			}
 		}
 		return f;
+	}
+	
+	/**
+	 * Use non-recursive dfs to compute the leader map
+	 */
+	public Map<String, String> computeLeaderMap(Graph<String, DefaultEdge> graph) {
+		cleanMap(graph);
+		Map<String, String> map = new HashMap<String, String>();
+		String s = "";
+		for (int i = graph.vertexSet().size(); i > 0; i--) {
+			String vex = String.valueOf(i);
+			if (!exploreMap.get(vex)) {
+				s = vex;
+				// DFS(G, vex)
+				Stack<String> stack = new Stack<String>();
+				stack.push(vex);
+				while (!stack.isEmpty()) {
+					String v = stack.pop();
+					exploreMap.replace(v, new Boolean(true));
+					// set leader(v) = node s
+					map.put(v, s);
+					List<String> neighbors = 
+							Graphs.successorListOf(
+									(DirectedGraph<String, DefaultEdge>)graph, v);
+					for (String neighbor : neighbors) {
+						if (!exploreMap.get(neighbor))
+							stack.push(neighbor);
+					}
+				}
+			}
+		}
+		return map;
 	}
 	
 	/**
