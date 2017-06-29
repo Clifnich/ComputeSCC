@@ -206,15 +206,28 @@ public class SCCCalculator {
 		File file = new File(filename);
 		BufferedReader rd = new BufferedReader(new FileReader(file));
 		String line = "";
+		int max = 0;
+		// First reading, find max vertex
 		while ((line = rd.readLine()) != null) {
 			// if it's not an empty line
 			if (!line.equals("")) {
 				String[] vertices = line.split(" ");
 				// add new vertices and edge to the graph
-				if (!graph.containsVertex(vertices[0]))
-					graph.addVertex(vertices[0]);
-				if (!graph.containsVertex(vertices[1]))
-					graph.addVertex(vertices[1]);
+				int v1 = Integer.valueOf(vertices[0]);
+				int v2 = Integer.valueOf(vertices[1]);
+				if (v1 > max) max = v1;
+				if (v2 > max) max = v2;
+			}
+		}
+		rd.close();
+		for (int i = 1; i <= max; i++)
+			graph.addVertex(String.valueOf(i));
+		// Second reading, add edges
+		rd = new BufferedReader(new FileReader(file));
+		line = "";
+		while ((line = rd.readLine()) != null) {
+			if (!line.equals("")) {
+				String[] vertices = line.split(" ");
 				// edge option, normal or inverse
 				if (option.equals(NORMAL))
 					graph.addEdge(vertices[0], vertices[1]);
@@ -222,7 +235,6 @@ public class SCCCalculator {
 					graph.addEdge(vertices[1], vertices[0]);
 			}
 		}
-		rd.close();
 		return graph;
 	}
 	
