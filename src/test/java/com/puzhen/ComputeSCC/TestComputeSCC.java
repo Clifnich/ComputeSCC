@@ -122,6 +122,34 @@ public class TestComputeSCC extends TestCase {
 	}
 	
 	/**
+	 * Test computing finishing time mapping.
+	 */
+	public void testFinishingTime2() throws IOException {
+		String filename = "33110.txt";
+		SCCCalculator calculator = new SCCCalculator();
+		Graph<String, DefaultEdge> graph = calculator.createInverseGraphFromFile(filename);
+		Map<String, String> f = calculator.computeFinishingTime(graph);
+		/*
+		 * 1	->	5
+		 * 2	->	6
+		 * 3	->	7
+		 * 4	->	8
+		 * 5	->	4
+		 * 6	->	1
+		 * 7	->	2
+		 * 8	->	3
+		 */
+		assertEquals("5", f.get("1"));
+		assertEquals("6", f.get("2"));
+		assertEquals("7", f.get("3"));
+		assertEquals("8", f.get("4"));
+		assertEquals("4", f.get("5"));
+		assertEquals("1", f.get("6"));
+		assertEquals("2", f.get("7"));
+		assertEquals("3", f.get("8"));
+	}
+	
+	/**
 	 * Test computing leaderMap
 	 * @throws IOException 
 	 */
@@ -190,6 +218,36 @@ public class TestComputeSCC extends TestCase {
 		int[] result = {3,3,3,0,0};
 		assertTrue(comparitor.arrayEquals(result, 
 				calculator.computeSCC("33300.txt")));
+	}
+	
+	/**
+	 * Compute the graph from 33110.txt
+	 */
+	public void testCompute3() throws IOException {
+		SCCCalculator calculator = new SCCCalculator();
+		int[] result = {3,3,1,1,0};
+		assertTrue(comparitor.arrayEquals(result, 
+				calculator.computeSCC("33110.txt")));
+	}
+	
+	/**
+	 * Compute the graph from 71000.txt
+	 */
+	public void testCompute4() throws IOException {
+		SCCCalculator calculator = new SCCCalculator();
+		int[] result = {7,1,0,0,0};
+		assertTrue(comparitor.arrayEquals(result, 
+				calculator.computeSCC("71000.txt")));
+	}
+	
+	/**
+	 * Compute the graph from 71000.txt
+	 */
+	public void testCompute5() throws IOException {
+		SCCCalculator calculator = new SCCCalculator();
+		int[] result = {6,3,2,1,0};
+		assertTrue(comparitor.arrayEquals(result, 
+				calculator.computeSCC("63210.txt")));
 	}
 }
 

@@ -72,7 +72,7 @@ public class FileProcessor {
 	public static void main(String[] args) {
 		FileProcessor processor = new FileProcessor();
 		try {
-			processor.deleteEmptyLines("33200.txt");
+			processor.deleteEmptyLines("63210.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -81,6 +81,9 @@ public class SCCCalculator {
 				while (!s_f.isEmpty()) {
 					vex = s_f.pop();
 					t++;
+					if (t > 875714) {
+						System.out.println("Finishing time for " + vex + " is too long: " + t);
+					}
 					f.put(vex, String.valueOf(t));
 				}
 			}
@@ -218,22 +221,26 @@ public class SCCCalculator {
 				if (v1 > max) max = v1;
 				if (v2 > max) max = v2;
 			}
+			line = null;
 		}
 		rd.close();
 		for (int i = 1; i <= max; i++)
 			graph.addVertex(String.valueOf(i));
 		// Second reading, add edges
 		rd = new BufferedReader(new FileReader(file));
-		line = "";
+		line = ""; String[] vertices = null;
 		while ((line = rd.readLine()) != null) {
 			if (!line.equals("")) {
-				String[] vertices = line.split(" ");
+				vertices = line.split(" ");
+				System.out.println("add edge: " + vertices[0] + "->" + vertices[1]);
 				// edge option, normal or inverse
 				if (option.equals(NORMAL))
 					graph.addEdge(vertices[0], vertices[1]);
 				else if (option.equals(INVERSE))
 					graph.addEdge(vertices[1], vertices[0]);
 			}
+			vertices = null;
+			line = null;
 		}
 		return graph;
 	}
@@ -258,7 +265,7 @@ public class SCCCalculator {
 	
 	public static void main(String[] args) throws IOException {
 		SCCCalculator calculator = new SCCCalculator();
-		int[] result = calculator.computeSCC("/Users/Ishmael/Desktop/scc.txt");
+		int[] result = calculator.computeSCC("C:\\Users\\puqian\\Desktop\\scc.txt");
 		for (int i : result)
 			System.out.println(i);
 	}
